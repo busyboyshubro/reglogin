@@ -244,7 +244,7 @@ class Home extends CI_Controller {
 							if($time < $this->session->userdata('loginAttempts')['firstattempt']){
 								echo json_encode(array( 
 									'flag' => 0,
-									'msg' => "User id blocked",
+									'msg' => "User id blocked for 5 Minutes",
 								));
 								exit;
 							}
