@@ -6,45 +6,6 @@
 			parent::__construct();
         }
         
-        // public function InsertCommon($TableName, $InsertArray)
-		// {
-		//     $insertRecord = $this->db->insert($TableName, $InsertArray);
-		// 	return $insertRecord;
-		// }
-		
-		// public function GetTableRecordsbyCondition($Select, $Table, $Condition)
-		// {			
-        //     $this->db->select($Select);
-        //     $this->db->from($Table);
-        //     $this->db->where($Condition);
-        //     $query = $this->db->get();
-        //     return $query->result();
-		// }
-
-		// public function GetSingleTableAllRecords($Table)
-		// {			
-        //     $this->db->select('*');
-        //     $this->db->from($Table);
-        //     $query = $this->db->get();
-        //     return $query->result();
-		// }
-
-		// public function UpdateCommon($id, $TableName, $UpdateArray, $column_id)
-        // {
-		// 	$this->db->where($column_id, $id);
-        //     $UpdateQuery = $this->db->update($TableName, $UpdateArray);
-        //     return $UpdateQuery;
-        // }
-        
-        // public function GetUserByUsername($username)
-        // {
-        //     return $this->db->get_where('adminlogin',array('username'=>$username))->num_rows();
-        // }	
-
-        // public function UserEmailExistCount($email)
-        // {
-        //     return $this->db->get_where('adminlogin',array('email'=>$email))->num_rows();
-        // }	
         function GetUserBymail($email)
         {
             $result = $this->db->get_where('adminlogin',array('email'=>$email))->row();
@@ -124,6 +85,47 @@
             return $result ;
         }
 
+        function email_otp_optout($token='')
+        {
+            // $result = $this->db->get_where('adminlogin',array('phone_no'=>$phone_no, 'deleted_flag'=>0))->row();	
+
+			$this->db->select('email_otp_optout.*, ');	
+			$this->db->from('email_otp_optout');
+			$this->db->where('email_otp_optout.token = ',$token);
+			$this->db->where('email_otp_optout.status = ',1);
+			// $this->db->or_where('login_session.email = ',$username);
+            $this->db->order_by('id','desc');	
+            // print_r($this->db->last_query());
+            $query = $this->db->get();
+            // $result = $query->row();
+            // return $result ;
+            if($query->num_rows() > 0) {
+                // return $result->result_array();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function check_email_otp($token='',$email_otp='')
+        {
+			$this->db->select('email_otp_optout.*, ');	
+			$this->db->from('email_otp_optout');
+			$this->db->where('email_otp_optout.token = ',$token);
+			$this->db->where('email_otp_optout.email_otp = ',$email_otp);
+			// $this->db->or_where('login_session.email = ',$username);
+            $this->db->order_by('id','desc');	
+            // print_r($this->db->last_query());
+            $query = $this->db->get();
+            // $result = $query->row();
+            // return $result ;
+            if($query->num_rows() > 0) {
+                // return $result->result_array();
+                return true;
+            } else {
+                return false;
+            }
+        }
         //login
     }
 

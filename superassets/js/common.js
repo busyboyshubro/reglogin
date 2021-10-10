@@ -91,8 +91,54 @@ $(document).ready(function() {
     });
 
 
+    $("#verification-user").validate({
+        ignore: ':hidden',
+        rules: {
+            userotp: {
+                required: true,
+                minlength: 4
+            }
+        },
+        messages: {
+            // username: { "required": "Please enter valid username or email." },
+            userotp: { "minlength": "Please enter 4 characters." }
+        },
+        submitHandler: function(form) {
+            $.ajax({
+                url: form.action,
+                type: 'ajax',
+                method: form.method,
+                dataType: 'json',
+                data: $(form).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.flag == 1) {
+                        $.toast({
+                            heading: '',
+                            text: response.msg,
+                            showHideTransition: 'slide',
+                            icon: 'success'
+                        })
+                        setTimeout(function() {
+                            window.location.href = response.redirect;
+                        }, 1000);
+                    } else {
+                        grecaptcha.reset();
+                        $.toast({
+                            heading: '',
+                            text: response.msg,
+                            showHideTransition: 'slide',
+                            icon: 'error'
+                        })
+                        setTimeout(function() {}, 1000);
+                    }
+                }
+            });
+        }
+    });
+
     $("#login-user").validate({
-        ignore: ':hidden:not("#hiddenRecaptcha1")',
+        ignore: ':hidden:not("#hiddenRecaptcha")',
         //ignore: ".ignore",
         rules: {
             username: {
@@ -103,7 +149,7 @@ $(document).ready(function() {
                 minlength: 8,
                 mypassword: true
             },
-            hiddenRecaptcha1: {
+            hiddenRecaptcha: {
                 required: function() {
                     if (grecaptcha.getResponse() == '') {
                         return true;
@@ -176,6 +222,6 @@ function recaptchaCallback() {
     $('#hiddenRecaptcha').valid();
 };
 
-function recaptchaCall() {
-    $('#hiddenRecaptcha1').valid();
-};
+// function recaptchaCall() {
+//     $('#hiddenRecaptcha').valid();
+// };

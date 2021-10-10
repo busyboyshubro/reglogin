@@ -23,6 +23,17 @@ class Home extends CI_Controller {
 		return $randomString;
 	}
 
+	private function generateOTPToken($length = 20)
+	{
+		$characters = '0123456789';
+		$charactersLength = strlen($characters);
+		$randomString = '';
+		for ($i = 0; $i < $length; $i++) {
+			$randomString .= $characters[rand(0, $charactersLength - 1)];
+		}
+		return $randomString;
+	}
+
 	// Login Page
 	public function index()
 	{
@@ -48,51 +59,53 @@ class Home extends CI_Controller {
 		// }		
 	}
 
-	// Login Function
-	// public function LoginUser()
-	// {
-	// 	$username = $this->input->post('Username');
-	// 	$password = $this->input->post('password');
-		
-	// 	$Select = '*';
-	// 	$Table = 'adminlogin';
-	// 	$Condition = "`username` = '".$username."'";
-        
-	// 	$userExist = $this->sup->GetTableRecordsbyCondition($Select, $Table, $Condition);
-    //     if( $userExist ){
-	// 		foreach($userExist as $row){
-	// 			$dbpassword = $row->password;
-	// 			$dbpassword = $this->encryption->decrypt($dbpassword);
+	public function verification_page($token)
+	{
+		$otpRecord = $this->CommonModel->email_otp_optout($token);
+		// $otpStatus$otpRecord->status;
+		// print_r($otpRecord); die();
+		if($otpRecord){
+			$data['token'] =$token;
+			$this->load->view('verification_page',$data);
+		} else{
+			redirect(base_url().'superuser');
+		}		
+	}
 
-	// 			$adminemail = $row->email;
-	// 			$userid = $row->userid;
-	// 			$username = $row->username;
-	// 			$role = $row->role;
+	public function verification()
+	{
+		if(isset($_POST) && $_POST != '') {
+			if(empty($_POST['userotp'])) {
+				echo json_encode(array('flag'=>0, 'msg'=>"Please enter valid OTP."));
+				exit;
+			} else{
+				$token=$_POST['token'];
+				$otpRecord = $this->CommonModel->check_email_otp($token,$_POST['userotp']);
+				// print_r($token); //die();
+				// echo $token; //die();
+				if($otpRecord){
+					$insertdata = array( 
+						'status'  => 2,
+					);
+					$this->db->where(array('token'=>$token));
+					$this->db->update('email_otp_optout', $insertdata);
 
-	// 		}
-	// 		if($password ==  $dbpassword){
-	// 					$accessToken = $this->generateToken();
-	// 					// $login_type = 1;
-	// 					$this->sup->InsertIntoLoginSession($userid, $accessToken, $role);
-	// 			$sessionData = array(
-	// 				'UserId' => $userid,
-	// 				'useremail' => $useremail,
-	// 				'username' => $username,
-	// 				'role' => $role,
-	// 				'LoginToken' => $accessToken,
-	// 			);
-	// 			$this->session->set_userdata($sessionData);
-	// 			redirect(base_url().'superuser');
-	// 		} else {
-	// 			$ResponseMessage = $this->session->set_flashdata('ErrorAlert', 'Password Does not Match !!');
-	// 			redirect(base_url().'home');				
-	// 		}
-
-    //     } else {
-    //     	$ResponseMessage = $this->session->set_flashdata('ErrorAlert', 'User Does not Exist !!');
-	// 		redirect(base_url().'home');
-    //     }
-	// }	
+					$redirect = base_url()."home/enter";							                   
+					echo json_encode(array(
+						'flag' => 1,
+						'msg' => "Success",
+						'redirect' => $redirect,
+					));
+					exit;
+				} else{
+					// redirect(base_url().'superuser');
+				}	
+			}
+		} else {
+			echo json_encode(array('flag'=>0, 'msg'=>"Please enter Your OTP."));
+			exit;
+		}
+	}
 
 	public function signUpPostData()
 	{
@@ -263,6 +276,7 @@ class Home extends CI_Controller {
 					$RecorduserName = $this->CommonModel->UsernameExistCount($_POST['username']);
 					// print_r($RecorduserName); die;
 					$UserDetails = $this->CommonModel->GetUserByEmailUsername($_POST['username']);
+					$user_email = $UserDetails->email;
 					
 					if ($UserDetails != '') {
 						$Pass1 = $UserDetails->password;
@@ -273,13 +287,53 @@ class Home extends CI_Controller {
 						// print_r($sessionRecord); die();
 						// print_r($this->session->userdata()); 
 						if ($sessionRecord != '') {
-							$redirect = base_url()."home/enter";							                   
+							
+							$string = '0123456789';
+							$string_shuffled = str_shuffle($string);
+							$getOTP = substr($string_shuffled, 0, 4);
+							$token = $this->generateToken();
+							$insertOTPdata = array(
+								'email_otp' => $user_email, 
+								'email_otp'	=> $getOTP,
+								'token'	=> $token,
+								
+							);
+							$this->db->insert('email_otp_optout', $insertOTPdata);
+							
+								
+							$this->load->config('email');
+							$this->load->library('email');
+							
+							$from = $this->config->item('smtp_user');
+							// $to = $this->input->post('to');
+							$subject = 'verification mail';
+							$emailmessage = 'Name : shubro<br>
+										Mobile : <br>
+										OTP : '.$getOTP.'<br>
+										Email : <br>
+										Message : <br>
+										';
+
+							// $this->email->from('team@magixproperty.com', 'Shubro');
+							$this->email->from($from, 'Shubro');
+							$this->email->to('subrop30@gmail.com');
+							$this->email->subject('Enquiry From verification');
+							$this->email->message($emailmessage);
+							// $this->email->send();
+							// $this->email->print_debugger(array('headers'));
+							if ($this->email->send()) {
+
+								$redirect = base_url()."home/verification_page/".$token;							                   
 								echo json_encode(array(
 									'flag' => 1,
 									'msg' => "Success",
-									'redirect' => $redirect
+									'redirect' => $redirect,
+									// 'token' => $token
 								));
 								exit;
+							}else{
+								print_r($this->email->print_debugger());
+							}
 						}else {
 							$this->load->library('GoogleAuthenticator');
 							// generates the secret code
@@ -306,15 +360,36 @@ class Home extends CI_Controller {
 								'login_time' => strtotime(date('Y-m-d H:i:s'))
 							));    
 							
-							$redirect = base_url()."home/enter";							                   
-								echo json_encode(array(
-									'flag' => 2,
-									'msg' => "Success",
-									'redirect' => $redirect,
-									'qrCodeUrl' => $qrCodeUrl,
-									'oneCode' => $oneCode
-								));
-								exit;
+							// $this->load->config('email');
+							// $this->load->library('email');
+							
+							// $from = $this->config->item('smtp_user');
+							// // $to = $this->input->post('to');
+							// $subject = 'verification mail';
+							// $emailmessage = 'Name : shubro<br>
+							// 			Mobile : <br>
+							// 			Alternate : <br>
+							// 			Email : <br>
+							// 			Message : <br>
+							// 			';
+
+							// $this->email->from($from, 'Shubro');
+							// $this->email->to('subrop30@gmail.com');
+							// $this->email->subject('Enquiry From verification');
+							// $this->email->message($emailmessage);
+
+							// if ($this->email->send()) {
+
+							// 	$redirect = base_url()."home/enter";							                   
+							// 	echo json_encode(array(
+							// 		'flag' => 2,
+							// 		'msg' => "Success",
+							// 		'redirect' => $redirect,
+							// 		'qrCodeUrl' => $qrCodeUrl,
+							// 		'oneCode' => $oneCode
+							// 	));
+							// 	exit;
+							// }
 						}
 					} else {
 						// print_r($this->session->userdata('loginAttempts'));
