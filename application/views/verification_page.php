@@ -35,6 +35,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form" id="verification-otp" style="display:none">
+                        <h4>Please Download Google Authenticator App on Your Phone</h4>
                         <h2>verification</h2>
                         <form id="verification-user" name="studentForm" method="POST" action="<?php echo base_url()?>home/verification" novalidate>
                             <div class="form-content">
