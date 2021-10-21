@@ -12,7 +12,7 @@
         <div class="container">
             <div class="row ">
                 <div class="col-md-3">
-                <a href="<?php echo base_url().'register';?>" class="btn btn-primary">Login page</a>
+                <a href="<?php echo base_url();?>" class="btn btn-primary">Login page</a>
                 </div>
                 <div class="col-md-6">
                     <div class="form">
