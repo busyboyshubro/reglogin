@@ -17,7 +17,7 @@
                                    
                 <div class="col-md-3">   
                     <fieldset class="form-group">
-                        <legend class="mt-4">re_verification_page</legend>
+                        <!-- <legend class="mt-4">re_verification_page</legend> -->
                         <legend class="mt-4">Choose Your Option</legend>
                         <div class="form-check">
                             <label class="form-check-label">
