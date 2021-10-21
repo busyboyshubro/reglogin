@@ -25,11 +25,11 @@ class Home extends CI_Controller {
 	// Login Page
 	public function index()
 	{
-		if(!$this->session->userdata("UserId")){
+		// if(!$this->session->userdata("UserId")){
 			$this->load->view('login');
-		} else{
-			redirect(base_url().'Home');
-		}		
+		// } else{
+			// redirect(base_url().'Home');
+		// }		
 	}
 
 	// Register Page
@@ -40,11 +40,11 @@ class Home extends CI_Controller {
 
 	public function enter()
 	{
-		if(!$this->session->userdata("UserId")){
+		// if(!$this->session->userdata("UserId")){
 			$this->load->view('enter');
-		} else{
-			redirect(base_url().'Home');
-		}		
+		// } else{
+			// redirect(base_url().'Home');
+		// }		
 	}
 
 	public function verification_page()
