@@ -11,11 +11,13 @@
     <body ng-app >
         <div class="container">
             <div class="row ">
-                <!-- <div class="col-md-12">   
+                <div class="col-md-12">   
+                    <?php //echo '<pre>'; print_r($security_que); echo '</pre>'; ?>
                 </div>
-                                    -->
+                                   
                 <div class="col-md-3">   
                     <fieldset class="form-group">
+                        <legend class="mt-4">re_verification_page</legend>
                         <legend class="mt-4">Choose Your Option</legend>
                         <div class="form-check">
                             <label class="form-check-label">
@@ -36,7 +38,11 @@
                 <div class="col-md-6">
                     <div class="form" id="verification-otp" style="display:none">
                         <h2>verification</h2>
-                        <form id="verification-user" name="studentForm" method="POST" action="<?php echo base_url()?>home/verification" novalidate>
+                        <div >
+
+                            <!-- <img  src="https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=<?=$qrCodeUrl?>&chld=H"  /> -->
+                        </div>
+                        <form id="f_verification_user" name="studentForm" method="POST" action="<?php echo base_url()?>home/verification" novalidate>
                             <div class="form-content">
                                 <div class="form-box"> 
                                     <label for="userotp">OTP</label>
@@ -46,7 +52,8 @@
                                     <span ng-show="studentForm.userotp.$touched && studentForm.userotp.$error.required">OTP is required.</span>
                                 </div>
                                 
-                                <input type="hidden" value="<?php echo $token; ?>" name="token"/> 
+                                <input id="qrCodeUrl" type="hidden" value="" name="qrCodeUrl"/> 
+                                <!-- <input type="hidden" value="<?php echo $token; ?>" name="token"/>  -->
                                 <div class="form-box">
                                     <input type="submit" name="submit" value="Submit">
                                 </div>
@@ -56,36 +63,20 @@
 
                     <div class="form" id="verification-security" style="display:none">
                         <h2>verification</h2>
-                        <form id="f_verification_security" name="F_s_Form" method="POST" action="<?php echo base_url()?>home/securityVerification" novalidate>
+                        <form id="verification_security" method="POST" action="<?php echo base_url()?>home/confirmsecurityVerification" novalidate>
                             <div class="form-content">
+                                <?php if(isset($security_que) && count($security_que) > 0) 
+                                    {
+                                    foreach($security_que as $security){ ?>
                                 <div class="form-box"> 
-                                    <label for="ans_1">1. What is your date of birth?</label>
-                                    <input type="text" placeholder="Your DOB" name="ans_1"/>
+                                    <label for="ans_<?php echo $security->id; ?>"><?php echo $security->questions; ?></label>
+                                    <input type="text" name="ans_<?php echo $security->id; ?>"/>
+                                    <!-- <span ng-show="userForm.ans_<?php echo $security->id; ?>.$touched && userForm.ans_<?php echo $security->id; ?>.$error.required">Answer is required.</span> -->
                                 </div>
-                                
-                                <div class="form-box"> 
-                                    <label for="ans_2">2. What was your favorite school teacher’s name?</label>
-                                    <input type="text" placeholder="Your school teacher’s name" name="ans_2"/>
-                                </div>
-                                
-                                <div class="form-box"> 
-                                    <label for="ans_3">3. What’s your favorite movie?</label>
-                                    <input type="text" placeholder="Your favorite movie" name="ans_3"/>
-                                </div>
-                                
-                                <div class="form-box"> 
-                                    <label for="ans_4">4. What was your first car?</label>
-                                    <input type="text" placeholder="Your DOB" name="ans_4"/>
-                                </div>
-                                
-                                <div class="form-box"> 
-                                    <label for="ans_5">5. What is your astrological sign?</label>
-                                    <input type="text" placeholder="Your DOB" name="ans_5"/>
-                                </div>
-                                
-                                <input type="hidden" value="<?php echo $token; ?>" name="token"/> 
+                                <?php } } ?>
+
                                 <div class="form-box">
-                                    <input type="submit" name="submit" value="Submit">
+                                    <input type="submit" value="Submit">
                                 </div>
                             </div>
                         </form>

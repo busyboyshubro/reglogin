@@ -1,5 +1,22 @@
 $(document).ready(function() {
 
+	$("#google-ver").change(function() {
+		if($(this).is(":checked")) {
+			$('#verification-otp').show();
+            $('#verification-security').hide();
+		} else {
+			$('#verification-otp').hide();
+		}
+	});
+
+	$("#security-ver").change(function() {
+		if($(this).is(":checked")) {
+			$('#verification-security').show();
+            $('#verification-otp').hide();
+		} else {
+			$('#verification-security').hide();
+		}
+	});
 
     $.validator.addMethod('mypassword', function(value, element) {
             return this.optional(element) || (value.match(/[a-zA-Z]/) && value.match(/[0-9]/) && value.match(/[!@#$%^&*():;?_~+=]/));
@@ -90,7 +107,6 @@ $(document).ready(function() {
         }
     });
 
-
     $("#verification-user").validate({
         ignore: ':hidden',
         rules: {
@@ -123,7 +139,158 @@ $(document).ready(function() {
                             window.location.href = response.redirect;
                         }, 1000);
                     } else {
-                        grecaptcha.reset();
+                        // grecaptcha.reset();
+                        $.toast({
+                            heading: '',
+                            text: response.msg,
+                            showHideTransition: 'slide',
+                            icon: 'error'
+                        })
+                        setTimeout(function() {}, 1000);
+                    }
+                }
+            });
+        }
+    });
+
+    $("#verification_security").validate({
+        ignore: ':hidden',
+        // rules: {
+        //     userotp: {
+        //         required: true,
+        //         minlength: 4
+        //     }
+        // },
+        // messages: {
+        //     // username: { "required": "Please enter valid username or email." },
+        //     userotp: { "minlength": "Please enter 4 characters." }
+        // },
+        submitHandler: function(form) {
+            $.ajax({
+                url: form.action,
+                type: 'ajax',
+                method: form.method,
+                dataType: 'json',
+                data: $(form).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.flag == 1) {
+                        $.toast({
+                            heading: '',
+                            text: response.msg,
+                            showHideTransition: 'slide',
+                            icon: 'success'
+                        })
+                        setTimeout(function() {
+                            window.location.href = response.redirect;
+                        }, 1000);
+                    } else {
+                        // grecaptcha.reset();
+                        $.toast({
+                            heading: '',
+                            text: response.msg,
+                            showHideTransition: 'slide',
+                            icon: 'error'
+                        })
+                        setTimeout(function() {}, 1000);
+                    }
+                }
+            });
+        }
+    });
+
+    $("#f_verification_user").validate({
+        ignore: ':hidden',
+        rules: {
+            userotp: {
+                required: true,
+                minlength: 4
+            }
+        },
+        messages: {
+            // username: { "required": "Please enter valid username or email." },
+            userotp: { "minlength": "Please enter 4 characters." }
+        },
+        submitHandler: function(form) {
+            $.ajax({
+                url: form.action,
+                type: 'ajax',
+                method: form.method,
+                dataType: 'json',
+                data: $(form).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.flag == 1) {
+                        $.toast({
+                            heading: '',
+                            text: response.msg,
+                            showHideTransition: 'slide',
+                            icon: 'success'
+                        })
+                        setTimeout(function() {
+                            window.location.href = response.redirect;
+                        }, 1000);
+                    } else {
+                        // grecaptcha.reset();
+                        $.toast({
+                            heading: '',
+                            text: response.msg,
+                            showHideTransition: 'slide',
+                            icon: 'error'
+                        })
+                        setTimeout(function() {}, 1000);
+                    }
+                }
+            });
+        }
+    });
+
+    $("#f_verification_security").validate({
+        ignore: ':hidden',
+        rules: {
+            ans_1: {
+                required: true,
+            },
+            ans_2: {
+                required: true,
+            },
+            ans_3: {
+                required: true,
+            },
+            ans_4: {
+                required: true,
+            },
+            ans_5: {
+                required: true,
+            }
+        },
+        messages: {
+            ans_1: { "required": "Please enter Your Answer." },
+            ans_2: { "required": "Please enter Your Answer." },
+            ans_3: { "required": "Please enter Your Answer." },
+            ans_4: { "required": "Please enter Your Answer." },
+            ans_5: { "required": "Please enter Your Answer." }
+        },
+        submitHandler: function(form) {
+            $.ajax({
+                url: form.action,
+                type: 'ajax',
+                method: form.method,
+                dataType: 'json',
+                data: $(form).serialize(),
+                success: function(response) {
+                    console.log(response);
+                    if (response.flag == 1) {
+                        $.toast({
+                            heading: '',
+                            text: response.msg,
+                            showHideTransition: 'slide',
+                            icon: 'success'
+                        })
+                        setTimeout(function() {
+                            window.location.href = response.redirect;
+                        }, 1000);
+                    } else {
                         $.toast({
                             heading: '',
                             text: response.msg,
@@ -196,6 +363,7 @@ $(document).ready(function() {
                         setTimeout(function() {
                             window.open(response.qrCodeUrl,'MyWindow','width=600,height=300');
                             window.location.href = response.redirect;
+                            $('#qrCodeUrl').val(response.qrCodeUrl);
                             // $('#appending').append(response.qrCodeUrl);	
                             // $('#oneCode').append(response.oneCode);	
                         }, 1000);

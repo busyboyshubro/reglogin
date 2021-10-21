@@ -85,26 +85,25 @@
             return $result ;
         }
 
-        function email_otp_optout($token='')
+        function email_otp_optout($userid='')
         {
-            // $result = $this->db->get_where('adminlogin',array('phone_no'=>$phone_no, 'deleted_flag'=>0))->row();	
-
 			$this->db->select('email_otp_optout.*, ');	
 			$this->db->from('email_otp_optout');
-			$this->db->where('email_otp_optout.token = ',$token);
-			$this->db->where('email_otp_optout.status = ',1);
+			$this->db->where('email_otp_optout.userid = ',$userid);
+			// $this->db->where('email_otp_optout.token = ',$token);
+			// $this->db->where('email_otp_optout.status = ',1);
 			// $this->db->or_where('login_session.email = ',$username);
             $this->db->order_by('id','desc');	
             // print_r($this->db->last_query());
             $query = $this->db->get();
-            // $result = $query->row();
-            // return $result ;
-            if($query->num_rows() > 0) {
-                // return $result->result_array();
-                return true;
-            } else {
-                return false;
-            }
+            $result = $query->row();
+            return $result ;
+            // if($query->num_rows() > 0) {
+            //     // return $result->result_array();
+            //     return true;
+            // } else {
+            //     return false;
+            // }
         }
 
         function check_email_otp($token='',$email_otp='')
@@ -122,6 +121,74 @@
             if($query->num_rows() > 0) {
                 // return $result->result_array();
                 return true;
+            } else {
+                return false;
+            }
+        }
+
+        function security_que($array_ans)
+        {
+			$this->db->select('security_que.*, ');	
+			$this->db->from('security_que');
+			$this->db->where_in('security_que.id',$array_ans);
+            // $this->db->where_in(RAND(0,1));
+            // $this->db->limit(2);
+            $query = $this->db->get();
+            // print_r($this->db->last_query()); die;
+            $result = $query->result();
+            return $result ;
+        }
+
+        function security_que_byId($ans)
+        {
+			$this->db->select('security_que.*, ');	
+			$this->db->from('security_que');
+			$this->db->where('security_que.id',$ans);
+            $query = $this->db->get();
+            // print_r($this->db->last_query()); die;
+            $result = $query->result();
+            return $result ;
+        }
+
+        function getuserfromtoken($token)
+        {
+			$this->db->select('email_otp_optout.*, ');	
+			$this->db->from('email_otp_optout');
+			$this->db->where('email_otp_optout.token = ',$token);
+			$this->db->where('email_otp_optout.status = ',1);
+            // print_r($this->db->last_query());
+            $query = $this->db->get();
+            $result = $query->row();
+            return $result ;
+        }
+
+        function check_security_ans($userid)
+        {
+			$this->db->select('security_ans.*, ');	
+			$this->db->from('security_ans');
+			$this->db->where('security_ans.userid = ',$userid);
+            $this->db->order_by('id','desc');	
+            // print_r($this->db->last_query());
+            $query = $this->db->get();
+            if($query->num_rows() > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function get_security_ans($que_id,$answer,$userid)
+        {
+			$this->db->select('security_ans.*, ');	
+			$this->db->from('security_ans');
+			$this->db->where('security_ans.userid = ',$userid);
+			$this->db->where_in('security_ans.que_id',$que_id);
+			$this->db->where_in('security_ans.answer',$answer);	
+            // print_r($this->db->last_query());
+            $query = $this->db->get();
+            if($query->num_rows() > 1) {
+                return true;                
+                // return $query->result();
             } else {
                 return false;
             }
